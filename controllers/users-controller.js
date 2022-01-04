@@ -1,56 +1,80 @@
 const HttpError = require("../models/http-error");
-const { v4: uuidv4 } = require("uuid");
+const User = require("../models/user");
+const { validationResult } = require("express-validator");
 
-const DUMMY_USERS = [
-  {
-    id: "u1",
-    name: "Luis Pérez",
-    pic: "https://images.pexels.com/photos/771742/pexels-photo-771742.jpeg?auto=compress&cs=tinysrgb&dpr=1&w=500",
-    likes: 400,
-    numPlaces: 2,
-    email: "test@test.com",
-    password: "1234",
-  },
-  {
-    id: "u2",
-    name: "Jose María",
-    pic: "http://bavette.es/wp-content/uploads/donuts-perfectos-copia-1.jpg",
-    likes: 2,
-    numPlaces: 102,
-    email: "test2@tes2t.com",
-    password: "1234333",
-  },
-];
 
-const getUsers = (req, res, next) => {
-  res.json({ users: DUMMY_USERS });
-  res.status(201).json({ users: DUMMY_USERS });
+const getUsers = async (req, res, next) => {
+
+  let users
+  try{
+    users = await User.find({},'-password'); //to exclude password
+  }catch(error){
+    return(next(new HttpError("Something went wrong. Could not get users"),500 ))
+  }
+
+  res.json({users: users.map(user => user.toObject({getters:true}))})
 };
 
-const signup = (req, res, next) => {
-  
-  const { name, email, password } = req.body;
+const signup = async (req, res, next) => {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return next(
+      new HttpError("Invalid inputs passed, please check you data.", 422)
+    );
+  }
 
-  const hasUser = DUMMY_USERS.find(u => u.email === email);
-  if(hasUser) throw new HttpError("Could not create user email already exists", 422);
+  const { name, email, password} = req.body;
 
-  const createdUser = {
-    id: uuidv4(),
+  let existingUser;
+  try {
+    existingUser = await User.findOne({ email: email });
+  } catch (error) {
+    return next(
+      new HttpError("Something went wrong, could not find user"),
+      500
+    );
+  }
+
+  if (existingUser) {
+    return next(
+      new HttpError("User exists already, please login instead"),
+      422
+    );
+  }
+
+  const createdUser = new User({
     name,
     email,
     password,
-  };
+    image:
+      "https://upload.wikimedia.org/wikipedia/commons/thumb/6/6e/Breezeicons-actions-22-im-user.svg/1200px-Breezeicons-actions-22-im-user.svg.png",
+    places: [], //al crear el usuario sus lugares están vacios
+  });
 
-  DUMMY_USERS.push(createdUser);
-  res.status(201).json({ user: createdUser });
+  try {
+    await createdUser.save();
+  } catch (error) {
+    return next(new HttpError("Signing up failed, please try again."), 500);
+  }
+
+  res.status(201).json({ user: createdUser.toObject({ getters: true }) });
 };
 
-const login = (req, res, next) => {
+const login = async (req, res, next) => {
   const { email, password } = req.body;
 
-  const identifiedUser = DUMMY_USERS.find((u) => u.email === email);
-  if (!identifiedUser || identifiedUser.password !== password) {
-    throw new HttpError("Could not identify user credentials", 401); //401 -> auth failed
+  let existingUser;
+  try {
+    existingUser = await User.findOne({ email: email });
+  } catch (error) {
+    return next(
+      new HttpError("Something went wrong, could not find user"),
+      500
+    );
+  }
+
+  if(!existingUser || existingUser.password !== password){
+    return(next(new HttpError("Invalid credentials. Could not verificate ")))
   }
 
   res.json({ message: "Logged in" });
