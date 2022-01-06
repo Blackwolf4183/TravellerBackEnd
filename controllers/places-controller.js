@@ -59,7 +59,7 @@ const createPlace = async (req, res, next) => {
     );
   }
 
-  const { title, description, mapsUrl, country, creatorId } = req.body;
+  const { title, description, mapsUrl, country,city, creatorId } = req.body;
 
   const createdPlace = new Place({
     title,
@@ -67,6 +67,7 @@ const createPlace = async (req, res, next) => {
     image:
       "https://images.unsplash.com/photo-1552832230-c0197dd311b5?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxzZWFyY2h8MXx8cm9tZXxlbnwwfHwwfHw%3D&w=1000&q=80",
     country,
+    city,
     mapsUrl,
     creatorId,
   });
@@ -85,23 +86,26 @@ const createPlace = async (req, res, next) => {
     return next(new HttpError("Could not find user for provided id"), 500);
   }
 
-  console.log(user);
+  /* console.log(user);
+  console.log(createdPlace) */
 
   try {
     const sess = await mongoose.startSession();
     sess.startTransaction();
     await createdPlace.save({session:sess});
-    user.places.push(createdPlace);
+    user.places.push(createdPlace); 
     await user.save({session:sess});
     await sess.commitTransaction();
 
   } catch (err) {
+    /* console.log(err); */
     const error = new HttpError("Failed creating place, please try again", 500);
     return next(error); //so code execution continues
   }
 
   res.status(201).json({ place: createdPlace }); //succesfully created and sent back the place
 };
+
 
 const updatePlace = async (req, res, next) => {
   const errors = validationResult(req);

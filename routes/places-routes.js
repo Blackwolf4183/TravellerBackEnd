@@ -14,6 +14,7 @@ router.post(
     check("title").not().isEmpty(),
     check("description").isLength({ min: 5 }),
     check("country").not().isEmpty(),
+    check("city").not().isEmpty(),
     check("mapsUrl").not().isEmpty(),
   ],
   placesController.createPlace

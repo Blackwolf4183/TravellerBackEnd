@@ -15,7 +15,28 @@ const getUsers = async (req, res, next) => {
   res.json({users: users.map(user => user.toObject({getters:true}))})
 };
 
+const getUserById = async (req,res,next) => {
+
+  const userId = req.params.uid;
+
+  let user;
+  try{
+    user = await User.findById(userId);
+  }catch(error){
+    return(next(new HttpError("Something went wrong when trying to reach for the user."),500 ))
+  }
+
+  if(!user){
+    return(next(new HttpError("Could not find an user with provided id."),500 ))
+  }
+
+  res.json({user: user.toObject({getters:true})});
+}
+
 const signup = async (req, res, next) => {
+
+  /* console.log("GOT SIGN UP REQUEST") */
+
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
     return next(
@@ -61,6 +82,7 @@ const signup = async (req, res, next) => {
 };
 
 const login = async (req, res, next) => {
+
   const { email, password } = req.body;
 
   let existingUser;
@@ -77,9 +99,11 @@ const login = async (req, res, next) => {
     return(next(new HttpError("Invalid credentials. Could not verificate ")))
   }
 
-  res.json({ message: "Logged in" });
+  res.json({ message: "Logged in",user: existingUser.toObject({getters: true}) });
 };
 
 exports.getUsers = getUsers;
+exports.getUserById = getUserById;
 exports.signup = signup;
 exports.login = login;
+

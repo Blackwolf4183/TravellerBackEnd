@@ -12,6 +12,16 @@ const app = express();
 
 app.use(bodyParser.json()); //before reaches places will parse incoming request body into js data structures and call next();
 
+app.use((req, res, next) => {
+  res.setHeader("Access-Control-Allow-Origin", "*");
+  res.setHeader(
+    "Access-Control-Allow-Headers",
+    "Origin, X-Requested-With,Content-Type,Accept,Authorization"
+  );
+  res.setHeader("Access-Control-Allow-Methods", "GET, POST, PATCH, DELETE");
+  next();
+});
+
 app.use("/api/main", mainRoutes);
 
 app.use("/api/places", placesRoutes); //for filtering
@@ -29,7 +39,9 @@ app.use((error, req, res, next) => {
 });
 
 moongose
-  .connect('mongodb+srv://ytterbium:C0mpl3m3nt0@cluster0.dcpvz.mongodb.net/places?retryWrites=true&w=majority')
+  .connect(
+    "mongodb+srv://ytterbium:C0mpl3m3nt0@cluster0.dcpvz.mongodb.net/traveller?retryWrites=true&w=majority"
+  )
   .then(
     app.listen(5000, function () {
       console.log("Express server listening on port 5000");

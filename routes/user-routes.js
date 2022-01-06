@@ -6,6 +6,8 @@ usersController = require("../controllers/users-controller");
 
 router.get("/", usersController.getUsers);
 
+router.get("/:uid",usersController.getUserById);
+
 router.post(
   "/signup",
   [
