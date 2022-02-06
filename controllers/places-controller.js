@@ -3,6 +3,8 @@ const { validationResult } = require("express-validator");
 const Place = require("../models/place");
 const User = require("../models/user");
 const mongoose = require('mongoose');
+const fs = require('fs');
+const path = require('path');
 
 const getPlaceById = async (req, res, next) => {
   const placeId = req.params.pid; //get the place id encoded in url
@@ -40,7 +42,7 @@ const getPlacesByUserId = async (req, res, next) => {
     );
   }
 
-  if (!places || places.length === 0) {
+  if (!places) {
     return next(
       new HttpError("Cound not find places from user with given id", 404)
     );
@@ -64,8 +66,7 @@ const createPlace = async (req, res, next) => {
   const createdPlace = new Place({
     title,
     description,
-    image:
-      "https://images.unsplash.com/photo-1552832230-c0197dd311b5?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxzZWFyY2h8MXx8cm9tZXxlbnwwfHwwfHw%3D&w=1000&q=80",
+    image:req.file.path ,
     country,
     city,
     mapsUrl,
@@ -157,6 +158,8 @@ const deletePlace = async (req, res, next) => {
     return(next(new HttpError("Could not find a place with given id"),404));
   }
 
+  const imagePath = place.image; 
+
   try{
     const sess = await mongoose.startSession();
     sess.startTransaction();
@@ -167,6 +170,10 @@ const deletePlace = async (req, res, next) => {
   }catch(error){
     return(next(new(HttpError("Something failed. Could not delete place"))))
   }
+
+  fs.unlink(imagePath, (err) => { //delete image place after deleting place
+    console.log(err);
+  }); 
 
   res.status(200).json({ message: "Deleted place." });
 };

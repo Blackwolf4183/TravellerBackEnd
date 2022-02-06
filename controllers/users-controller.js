@@ -38,6 +38,7 @@ const signup = async (req, res, next) => {
   /* console.log("GOT SIGN UP REQUEST") */
 
   const errors = validationResult(req);
+
   if (!errors.isEmpty()) {
     return next(
       new HttpError("Invalid inputs passed, please check you data.", 422)
@@ -67,8 +68,7 @@ const signup = async (req, res, next) => {
     name,
     email,
     password,
-    image:
-      "https://upload.wikimedia.org/wikipedia/commons/thumb/6/6e/Breezeicons-actions-22-im-user.svg/1200px-Breezeicons-actions-22-im-user.svg.png",
+    image:(req.file ? req.file.path : "none") ,
     places: [], //al crear el usuario sus lugares están vacios
   });
 
