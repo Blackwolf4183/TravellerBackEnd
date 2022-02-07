@@ -18,9 +18,11 @@
   },
   "homepage": "https://github.com/Blackwolf4183/TravellerBackEnd#readme",
   "dependencies": {
+    "bcryptjs": "^2.4.3",
     "body-parser": "^1.19.1",
     "express": "^4.17.2",
     "express-validator": "^6.14.0",
+    "jsonwebtoken": "^8.5.1",
     "mongodb": "^4.2.2",
     "mongoose": "^6.1.5",
     "mongoose-unique-validator": "^2.0.3",

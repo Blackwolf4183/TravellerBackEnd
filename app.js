@@ -50,7 +50,7 @@ app.use((error, req, res, next) => {
 
 moongose
   .connect(
-    "mongodb+srv://ytterbium:C0mpl3m3nt0@cluster0.dcpvz.mongodb.net/traveller?retryWrites=true&w=majority"
+    `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASSWORD}@cluster0.dcpvz.mongodb.net/${process.env.DB_NAME}?retryWrites=true&w=majority`
   )
   .then(
     app.listen(5000, function () {

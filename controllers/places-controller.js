@@ -6,6 +6,7 @@ const mongoose = require('mongoose');
 const fs = require('fs');
 const path = require('path');
 
+
 const getPlaceById = async (req, res, next) => {
   const placeId = req.params.pid; //get the place id encoded in url
 
@@ -63,6 +64,8 @@ const createPlace = async (req, res, next) => {
 
   const { title, description, mapsUrl, country,city, creatorId } = req.body;
 
+  /* console.log("creator id should be: " + req.userData.userId); */
+
   const createdPlace = new Place({
     title,
     description,
@@ -70,7 +73,7 @@ const createPlace = async (req, res, next) => {
     country,
     city,
     mapsUrl,
-    creatorId,
+    creatorId: req.userData.userId,
   });
 
   /*   console.log(createdPlace); */
@@ -78,7 +81,7 @@ const createPlace = async (req, res, next) => {
   let user;
 
   try {
-    user = await User.findById(creatorId);
+    user = await User.findById(req.userData.userId);
   } catch (error) {
     return next(new HttpError("Something went wrong. Could not create place"), 500);
   }
@@ -128,6 +131,10 @@ const updatePlace = async (req, res, next) => {
     );
   }
 
+  if(place.creatorId.toString() !== req.userData.userId){ //if token extracted user id doesn't match place creator id, then someone is trying to access it without being his
+    return next(new HttpError("You are not allowed to edit this place", 401))
+  }
+
   place.title = title;
   place.description = description;
 
@@ -156,6 +163,11 @@ const deletePlace = async (req, res, next) => {
 
   if(!place){
     return(next(new HttpError("Could not find a place with given id"),404));
+  }
+
+  //extra security to check owner is deleting his place and not anyone else
+  if(place.creatorId.id !== req.userData.userId){ //if token extracted user id doesn't match place creator id, then someone is trying to access it without being his
+    return next(new HttpError("You are not allowed to edit this place", 401))
   }
 
   const imagePath = place.image; 
