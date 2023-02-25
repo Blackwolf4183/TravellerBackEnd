@@ -7,7 +7,7 @@
    "node":"14.x"
   },
   "scripts": {
-    "start": "node app.js"
+    "start": "node ./api/index.js"
   },
   "repository": {
     "type": "git",
