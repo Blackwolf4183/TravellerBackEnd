@@ -9,9 +9,13 @@ const placesRoutes = require("../routes/places-routes");
 const userRoutes = require("../routes/user-routes");
 const mainRoutes = require("../routes/main-routes");
 
+<<<<<<< HEAD:api/index.js
 const HttpError = require("../models/http-error");
 require('dotenv').config()
 
+=======
+const HttpError = require("./models/http-error");
+>>>>>>> parent of f9616cc (Preparations for Vercel hosting):app.js
 
 const app = express();
 

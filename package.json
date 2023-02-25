@@ -3,9 +3,12 @@
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
+<<<<<<< HEAD
   "engines":{
    "node":"14.x"
   },
+=======
+>>>>>>> parent of f9616cc (Preparations for Vercel hosting)
   "scripts": {
     "start": "node ./api/index.js"
   },
