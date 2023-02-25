@@ -17,7 +17,7 @@ const app = express();
 
 app.use(bodyParser.json()); //before reaches places will parse incoming request body into js data structures and call next();
 
-app.use('/uploads/images',express.static(path.join('uploads','images')))
+app.use('../uploads/images',express.static(path.join('uploads','images')))
 
 app.use((req, res, next) => {
   res.setHeader("Access-Control-Allow-Origin", "*");
