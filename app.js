@@ -10,6 +10,8 @@ const userRoutes = require("./routes/user-routes");
 const mainRoutes = require("./routes/main-routes");
 
 const HttpError = require("./models/http-error");
+require('dotenv').config()
+
 
 const app = express();
 
